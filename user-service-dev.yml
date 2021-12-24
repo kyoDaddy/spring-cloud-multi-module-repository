@@ -1,0 +1,95 @@
+spring:
+  application:
+    name: user-service
+  config:
+    activate:
+      on-profile: dev
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+  # apply spring-bus with rabbitmq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: admin
+  # setting dev redis
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 5000
+  # setting dev db
+  r2dbc:
+    url: r2dbc:mariadb://127.0.0.1:3306/userdb
+    username: admin
+    password: test!1234
+    # config from https://github.com/r2dbc/r2dbc-pool
+    pool:
+      initialSize: 10
+      maxSize: 100
+      #30 minutes
+      maxIdleTime: PT30M
+      validationQuery: SELECT 1
+
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  #random port
+  port: 0
+  shutdown:
+    grace-period: 5000
+
+grpc:
+  server:
+    port: 9898
+  shutdownGrace: 30
+
+eureka:
+  #Load Balancer
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+
+
+logging:
+  level:
+    com.mall.userservice: INFO
+    com:
+      mall:
+        userservice:
+          process:
+            user:
+              client: INFO
+    io:
+      r2dbc:
+        pool: INFO
+    org:
+      springframework:
+        r2dbc: INFO
+        data:
+          r2dbc:
+            connectionfactory: INFO
+  file:
+    path: D:/logs/
+
+jwt:
+  secret-key: testkyo
+  expires-minutes: 1440 # 24hr
+
+# apply actuator refresh, health, beans, httptrace, busrefresh
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health,beans,httptrace,busrefresh
+
+daemon:
+  nick-name: kyo dev
